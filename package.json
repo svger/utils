@@ -1,0 +1,40 @@
+{
+  "name": "biz-utils",
+  "version": "0.0.1",
+  "description": "业务公共 utils",
+  "main": "index.js",
+  "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
+  "author": "Kane <xiaoyunhua@shhxzq.com>",
+  "license": "MIT",
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "browsers": [
+              "Android >= 4",
+              "iOS >= 7",
+              "Safari >= 7",
+              "not ie <= 8"
+            ]
+          }
+        }
+      ],
+      "stage-1"
+    ]
+  },
+  "devDependencies": {
+    "babel-cli": "~6.26.0",
+    "babel-eslint": "~8.0.2",
+    "babel-preset-env": "~1.6.1",
+    "cefc-tools": "~0.0.4",
+    "eslint": "~4.11.0",
+    "eslint-config-airbnb-base": "~12.1.0",
+    "eslint-plugin-import": "~2.8.0"
+  },
+  "dependencies": {
+    "cefc-utils": "~0.0.2",
+    "qs": "~6.5.1"
+  }
+}
