@@ -35,6 +35,8 @@
   },
   "dependencies": {
     "cefc-utils": "~0.0.2",
-    "qs": "~6.5.1"
+    "qs": "~6.5.1",
+    "redux": "~3.7.2",
+    "redux-thunk": "~2.2.0"
   }
 }
