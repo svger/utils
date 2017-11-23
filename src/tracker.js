@@ -100,12 +100,12 @@ function uploadTrackInfo(uploader) {
  * // 监听页面改变
  * browserHistory.listen(() => pageView(upload));
  *
- * @param {function} uploader 上传数据
+ * @param {function} reporter 上传数据
  */
-export default function pageView(uploader) {
+export function pageView(reporter) {
   // 页面停留时间监控
   if (hasCache()) {
-    page(uploadTrackInfo(uploader));
+    page(uploadTrackInfo(reporter));
   }
 
   cache(window.location.href, {
