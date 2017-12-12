@@ -6,6 +6,9 @@
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
   "author": "Kane <xiaoyunhua@shhxzq.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha --require babel-polyfill --require babel-register"
+  },
   "babel": {
     "presets": [
       [
@@ -27,14 +30,21 @@
   "devDependencies": {
     "babel-cli": "~6.26.0",
     "babel-eslint": "~8.0.2",
+    "babel-polyfill": "~6.26.0",
     "babel-preset-env": "~1.6.1",
+    "babel-register": "~6.26.0",
     "cefc-tools": "~0.0.4",
+    "chai": "~4.1.2",
     "eslint": "~4.11.0",
     "eslint-config-airbnb-base": "~12.1.0",
-    "eslint-plugin-import": "~2.8.0"
+    "eslint-plugin-import": "~2.8.0",
+    "mocha": "~4.0.1",
+    "sinon": "~4.1.2"
   },
   "dependencies": {
+    "axios": "~0.17.1",
     "cefc-utils": "~0.0.2",
+    "eventemitter3": "~3.0.0",
     "qs": "~6.5.1",
     "redux": "~3.7.2",
     "redux-thunk": "~2.2.0"

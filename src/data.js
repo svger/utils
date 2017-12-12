@@ -21,7 +21,16 @@ export const getOAC = () => {
  * @returns
  */
 export const getAppMeta = () => {
-  return { version: window.appVersion };
+  const {
+    appVersion, deviceType, platform, debug
+  } = window;
+
+  return {
+    version: appVersion,
+    deviceType,
+    platform,
+    debug
+  };
 }
 
 /**
