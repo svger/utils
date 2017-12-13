@@ -26,10 +26,14 @@ import Log from './log';
  *   close() { Loading.hide(); },
  *   fail() { Loading.show({ content: '加载失败', state: 'fail', time: 1500, isHide: true }); }
  * };
+ *
+ * // 业务错误码默认处理
  * Request.on(Request.ResEvtType.DEFAULT_BIZ_ERR, () => { // 弹框提示错误信息 });
+ *
+ * // 业务错误码特殊处理，适用于所有请求的错误码
  * const AUTH_ERR_CODE = Request.buildBizErrTypeWithCode('123456');
  * Request.on(AUTH_ERR_CODE, () => { // 跳转到登录页面 });
- *
+ * // 适用于特定请求的业务错误码处理
  * const BIZ_ERR_CODE = Request.buildBizErrTypeWithCode('234567');
  * Request.once(BIZ_ERR_CODE, () => { // 错误码处理 })
  *
@@ -65,17 +69,34 @@ request.defaults.timeout = 1000 * 60;
  * @param {boolean} config.silent 是否静默请求，不展示 loading，默认不展示 true
  */
 function Request(config) {
-  if (!config.cancelToken) {
-    config._source = axios.CancelToken.source();
-    config.cancelToken = config._source.token;
+  // if (!config.cancelToken) {
+  //   config._source = axios.CancelToken.source();
+  //   config.cancelToken = config._source.token;
+  // }
+
+  // 3
+  const uniqId = genReqUniqId({
+    baseURL: request.defaults.baseURL,
+    ...config
+  });
+
+  if (Request._reqs.has(uniqId)) {
+    return Promise.reject(SAME_REQ_CANCELED);
   }
+  Request._reqs.add(uniqId);
+  config.extra = { uniqId };
 
   request(config);
 }
 
 const EE = new EventEmitter();
 
-Object.assign(Request, EE);
+Request.on = (...args) => { EE.on(...args) };
+Request.once = (...args) => { EE.once(...args) };
+Request.off = (...args) => { EE.off(...args) };
+Request.removeAllListeners = (...args) => { EE.removeAllListeners(...args); };
+
+Object.assign(Request, EventEmitter.prototype);
 
 // 所有请求方法集合
 Request.Methods = {
@@ -112,16 +133,16 @@ const SAME_REQ_CANCELED = 'same_req_canceled';
 
 // 请求拦截器
 function reqInspector(config) {
-  const uniqId = genReqUniqId(config);
-
   // 3
-  if (Request._reqs.has(uniqId)) {
-    config._source && config._source.cancel(SAME_REQ_CANCELED);
+  // const uniqId = genReqUniqId(config);
+  
+  // if (Request._reqs.has(uniqId)) {
+  //   config._source && config._source.cancel(SAME_REQ_CANCELED);
 
-    return config;
-  }
+  //   return config;
+  // }
 
-  Request._reqs.add(uniqId);
+  // Request._reqs.add(uniqId);
 
   // 1
   if (Request.loading.on && !config.silent) {
@@ -158,8 +179,6 @@ function reqInspector(config) {
 
   config.params._ = Date.now();
 
-  config.extra = { uniqId };
-
   return config;
 }
 
@@ -191,18 +210,7 @@ function resInspector(res) {
 
   // 1
   if (Request.loading.on && !config.silent) {
-    // 网络错误或服务异常
-    if (status !== 200) {
-      Request.loading.fail();
-      Request.emit(Request.ResEvtType.NET_ERR, res);
-      Log.warn({
-        name: '网络错误或服务异常',
-        error: { data, status, statusText },
-        ...errInfo
-      });
-    } else {
-      Request.loading.close();
-    }
+    Request.loading.close();
   }
 
   // 4
@@ -219,11 +227,11 @@ function resInspector(res) {
       const bizErrType = buildBizErrTypeWithCode(data.error.code);
 
       // 项目有特殊处理
-      if (Request.listenerCount(bizErrType) > 0) {
-        Request.emit(bizErrType, data.error);
+      if (EE.listenerCount(bizErrType) > 0) {
+        EE.emit(bizErrType, data.error);
       } else {
         // 业务错误码默认处理
-        Request.emit(Request.ResEvtType.DEFAULT_BIZ_ERR, data.error);
+        EE.emit(Request.ResEvtType.DEFAULT_BIZ_ERR, data.error);
       }
     }
   }
@@ -232,6 +240,30 @@ function resInspector(res) {
 }
 
 function resErrInspector(error) {
+  const {
+    data, config, status, statusText, headers
+  } = error.response;
+  const errInfo = {
+    api: config.url,
+    req: {
+      method: config.method,
+      params: config.params,
+      data: config.data,
+      headers: config.headers,
+      responseType: config.responseType,
+      timeout: config.timeout
+    },
+    res: { headers }
+  };
+  // 网络错误或服务异常
+  Request.loading.fail();
+  EE.emit(Request.ResEvtType.NET_ERR, error.response);
+  Log.warn({
+    name: '网络错误或服务异常',
+    error: { data, status, statusText },
+    ...errInfo
+  });
+
   return Promise.reject(error);
 }
 
@@ -240,7 +272,7 @@ function resErrInspector(error) {
  * @param {object} config req 配置
  */
 function genReqUniqId({
-  baseURL, url, method, data, headers, params
+  baseURL, url, method, data, params
 }) {
   if (method === Request.Methods.GET
     || method === Request.Methods.DELETE
@@ -252,13 +284,13 @@ function genReqUniqId({
       delete _params._;
     }
 
-    return `${method}|${baseURL}${url}|${JSON.stringify(_params)}|${JSON.stringify(headers)}`;
+    return `${method}|${baseURL}${url}|${JSON.stringify(_params)}`;
   }
 
   if (method === Request.Methods.POST
     || method === Request.Methods.PUT
     || method === Request.Methods.PATCH) {
-    return `${method}|${baseURL}${url}|${JSON.stringify(data)}|${JSON.stringify(headers)}`;
+    return `${method}|${baseURL}${url}|${JSON.stringify(data)}`;
   }
 }
 
@@ -273,6 +305,9 @@ function buildBizErrTypeWithCode(code) {
 function reqFactory(type) {
   return function(url, data, config) {
     let short = false;
+    let ret = {
+      baseURL: request.defaults.baseURL, url, method: type
+    }
 
     if (type === Request.Methods.GET
       || type === Request.Methods.DELETE
@@ -281,12 +316,28 @@ function reqFactory(type) {
     ) {
       config = data;
       short = true;
+    } else {
+      ret.data = data;
     }
 
-    if (!config.cancelToken) {
-      config._source = axios.CancelToken.source();
-      config.cancelToken = config._source.token;
+    if (!config) {
+      config = {};
     }
+
+    ret.params = config.params;
+
+    // if (!config.cancelToken) {
+    //   config._source = axios.CancelToken.source();
+    //   config.cancelToken = config._source.token;
+    // }
+    
+    // 3
+    const uniqId = genReqUniqId(ret);
+    if (Request._reqs.has(uniqId)) {
+      return Promise.reject(SAME_REQ_CANCELED);
+    }
+    Request._reqs.add(uniqId);
+    config.extra = { uniqId };
 
     if (short) {
       return request[type](url, config);
