@@ -2,7 +2,7 @@
   "name": "biz-utils",
   "version": "0.0.1",
   "description": "业务公共 utils",
-  "main": "index.js",
+  "main": "src/index.js",
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
   "author": "Kane <xiaoyunhua@shhxzq.com>",
   "license": "MIT",
