@@ -8693,7 +8693,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_sinon__ = __webpack_require__(92);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_sinon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_sinon__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_request__ = __webpack_require__(123);
-/* global describe, it */
+/* global describe, it, beforeEach */
 
 
 
@@ -8727,21 +8727,21 @@ describe('限流', function () {
       }
     }).then(cb);
 
-    var p2 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
       params: {
         num: 6,
         id: 50
       }
     }).then(cb).catch(catchHandler);
 
-    var p3 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
       params: {
         num: 6,
         id: 50
       }
     }).then(cb).catch(catchHandler);
 
-    var p4 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
       params: {
         num: 6,
         id: 50
@@ -8769,7 +8769,7 @@ describe('baseURL 配置', function () {
     __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
       method: 'sas.assetsQuery',
       fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).then(function (ret) {
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(ret.length > 0);
       done();
@@ -8778,6 +8778,7 @@ describe('baseURL 配置', function () {
 });
 
 describe('loading 配置', function () {
+  // eslint-disable-next-line one-var, init-declarations
   var show = void 0,
       close = void 0,
       fail = void 0;
@@ -8789,7 +8790,9 @@ describe('loading 配置', function () {
 
     __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading = {
       on: true,
-      show: show, close: close, fail: fail
+      show: show,
+      close: close,
+      fail: fail
     };
   });
 
@@ -8797,7 +8800,7 @@ describe('loading 配置', function () {
     __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
       method: 'sas.assetsQuery',
       fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).then(function (res) {
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(show.calledOnce, '展示loading');
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(close.calledOnce, '关闭loading');
@@ -8822,7 +8825,7 @@ describe('loading 配置', function () {
       data: {
         method: 'sas.assetsQuery',
         // fundId: '880004877',
-        moneyType: "0"
+        moneyType: '0'
       },
       silent: true
     }).catch(function (err) {
@@ -8848,15 +8851,15 @@ describe('loading 配置', function () {
 describe('业务错误码处理', function () {
   it('若对错误码没有特殊处理，则使用默认处理', function (done) {
     var defaultBizErrHandler = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].on(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].ResEvtType.DEFAULT_BIZ_ERR, defaultBizErrHandler);
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].on(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].ResEvtTypes.DEFAULT_BIZ_ERR, defaultBizErrHandler);
 
     __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
       method: 'sas.assetsQuery',
       // fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).catch(function (err) {
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(defaultBizErrHandler.calledOnce, '业务错误码默认处理');
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].off(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].ResEvtType.DEFAULT_BIZ_ERR);
+      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].off(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].ResEvtTypes.DEFAULT_BIZ_ERR);
       done();
     });
   });
@@ -8868,11 +8871,11 @@ describe('业务错误码处理', function () {
 
     __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('kh', {
       method: 'sso.login',
-      inputId: "880004877",
+      inputId: '880004877',
       inputType: 'Z',
       netAddr: '5',
       netAddr2: '5',
-      cryptPwd: ""
+      cryptPwd: ''
     }).catch(function (err) {
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(notLoginHandler.calledOnce, '具体业务错误码处理');
       __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].off(pwdErrCode);
@@ -8888,7 +8891,7 @@ describe('业务错误码处理', function () {
     __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
       method: 'sas.assetsQuery',
       // fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).catch(function (err) {
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(bizErrHandler.calledOnce, '特殊业务错误码处理');
       done();
@@ -8910,8 +8913,6 @@ describe('业务错误码处理', function () {
       },
       preventHandleResError: true
     }).catch(function (err) {
-      console.log('业务错误：', err);
-
       __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(bizErrHandler.callCount, 0, '不应被调用');
       done();
     });
@@ -21850,8 +21851,7 @@ function Request(config) {
   config.extra = { uniqId: uniqId };
 
   return request(config).then(function (res) {
-    var method = config.method;
-    if (isNoBodyMethod(method)) {
+    if (isNoBodyMethod(config.method)) {
       return res.data;
     }
 
@@ -21890,7 +21890,7 @@ Request.Methods = {
 };
 
 // 所有响应事件
-Request.ResEvtType = {
+Request.ResEvtTypes = {
   BIZ_ERR: 'biz_err',
   NET_ERR: 'net_err',
   DEFAULT_BIZ_ERR: 'default_biz_err'
@@ -21980,7 +21980,7 @@ function resInspector(res) {
       responseType: config.responseType,
       timeout: config.timeout
     },
-    res: { headers: headers }
+    res: { status: status, statusText: statusText, headers: headers }
   };
 
   // 3
@@ -22009,7 +22009,7 @@ function resInspector(res) {
         EE.emit(bizErrType, data.error);
       } else {
         // 业务错误码默认处理
-        EE.emit(Request.ResEvtType.DEFAULT_BIZ_ERR, data.error);
+        EE.emit(Request.ResEvtTypes.DEFAULT_BIZ_ERR, data.error);
       }
     }
   }
@@ -22035,17 +22035,17 @@ function resErrInspector(error) {
       responseType: config.responseType,
       timeout: config.timeout
     },
-    res: { headers: headers }
+    res: { status: status, statusText: statusText, headers: headers }
   };
   // 网络错误或服务异常
   if (Request.loading.on && !config.silent) {
     Request.loading.fail();
   }
 
-  EE.emit(Request.ResEvtType.NET_ERR, error.response);
+  EE.emit(Request.ResEvtTypes.NET_ERR, error.response);
   __WEBPACK_IMPORTED_MODULE_5__log__["a" /* default */].warn(_extends({
     name: '网络错误或服务异常',
-    error: { data: data, status: status, statusText: statusText }
+    error: { data: data }
   }, errInfo));
 
   return Promise.reject(error);
@@ -22080,12 +22080,11 @@ function genReqUniqId(_ref) {
  * @param {string} code 业务错误码
  */
 function buildBizErrTypeWithCode(code) {
-  return Request.ResEvtType.BIZ_ERR + '_' + code;
+  return Request.ResEvtTypes.BIZ_ERR + '_' + code;
 }
 
 function reqFactory(method) {
   return function (url, data, config) {
-    var short = false;
     var ret = {
       baseURL: request.defaults.baseURL, url: url, method: method
     };

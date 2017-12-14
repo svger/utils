@@ -1,4 +1,4 @@
-/* global describe, it */
+/* global describe, it, beforeEach */
 import { assert } from 'chai';
 import sinon from 'sinon';
 import Request from '../src/request';
@@ -32,21 +32,21 @@ describe('限流', () => {
       }
     }).then(cb);
 
-    const p2 = Request.get(stockSearchUrl, {
+    Request.get(stockSearchUrl, {
       params: {
         num: 6,
         id: 50
       }
     }).then(cb).catch(catchHandler);
 
-    const p3 = Request.get(stockSearchUrl, {
+    Request.get(stockSearchUrl, {
       params: {
         num: 6,
         id: 50
       }
     }).then(cb).catch(catchHandler);
 
-    const p4 = Request.get(stockSearchUrl, {
+    Request.get(stockSearchUrl, {
       params: {
         num: 6,
         id: 50
@@ -74,7 +74,7 @@ describe('baseURL 配置', () => {
     Request.post('sas', {
       method: 'sas.assetsQuery',
       fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).then((ret) => {
       assert.ok(ret.length > 0);
       done();
@@ -83,6 +83,7 @@ describe('baseURL 配置', () => {
 });
 
 describe('loading 配置', () => {
+  // eslint-disable-next-line one-var, init-declarations
   let show, close, fail;
 
   beforeEach(() => {
@@ -92,7 +93,9 @@ describe('loading 配置', () => {
 
     Request.loading = {
       on: true,
-      show, close, fail
+      show,
+      close,
+      fail
     };
   });
 
@@ -100,7 +103,7 @@ describe('loading 配置', () => {
     Request.post('sas', {
       method: 'sas.assetsQuery',
       fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).then((res) => {
       assert.ok(show.calledOnce, '展示loading');
       assert.ok(close.calledOnce, '关闭loading');
@@ -125,7 +128,7 @@ describe('loading 配置', () => {
       data: {
         method: 'sas.assetsQuery',
         // fundId: '880004877',
-        moneyType: "0"
+        moneyType: '0'
       },
       silent: true
     }).catch((err) => {
@@ -151,15 +154,15 @@ describe('loading 配置', () => {
 describe('业务错误码处理', () => {
   it('若对错误码没有特殊处理，则使用默认处理', (done) => {
     const defaultBizErrHandler = sinon.spy();
-    Request.on(Request.ResEvtType.DEFAULT_BIZ_ERR, defaultBizErrHandler);
+    Request.on(Request.ResEvtTypes.DEFAULT_BIZ_ERR, defaultBizErrHandler);
 
     Request.post('sas', {
       method: 'sas.assetsQuery',
       // fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).catch((err) => {
       assert.ok(defaultBizErrHandler.calledOnce, '业务错误码默认处理');
-      Request.off(Request.ResEvtType.DEFAULT_BIZ_ERR);
+      Request.off(Request.ResEvtTypes.DEFAULT_BIZ_ERR);
       done();
     });
   });
@@ -171,11 +174,11 @@ describe('业务错误码处理', () => {
 
     Request.post('kh', {
       method: 'sso.login',
-      inputId: "880004877",
+      inputId: '880004877',
       inputType: 'Z',
       netAddr: '5',
       netAddr2: '5',
-      cryptPwd: ""
+      cryptPwd: ''
     }).catch((err) => {
       assert.ok(notLoginHandler.calledOnce, '具体业务错误码处理');
       Request.off(pwdErrCode);
@@ -191,7 +194,7 @@ describe('业务错误码处理', () => {
     Request.post('sas', {
       method: 'sas.assetsQuery',
       // fundId: '880004877',
-      moneyType: "0"
+      moneyType: '0'
     }).catch((err) => {
       assert.ok(bizErrHandler.calledOnce, '特殊业务错误码处理');
       done();

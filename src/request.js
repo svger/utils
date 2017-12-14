@@ -88,8 +88,7 @@ function Request(config) {
   config.extra = { uniqId };
 
   return request(config).then((res) => {
-    const method = config.method;
-    if (isNoBodyMethod(method)) {
+    if (isNoBodyMethod(config.method)) {
       return res.data;
     }
 
@@ -120,7 +119,7 @@ Request.Methods = {
 };
 
 // 所有响应事件
-Request.ResEvtType = {
+Request.ResEvtTypes = {
   BIZ_ERR: 'biz_err',
   NET_ERR: 'net_err',
   DEFAULT_BIZ_ERR: 'default_biz_err'
@@ -200,7 +199,7 @@ function resInspector(res) {
       responseType: config.responseType,
       timeout: config.timeout
     },
-    res: { headers }
+    res: { status, statusText, headers }
   };
 
   // 3
@@ -230,7 +229,7 @@ function resInspector(res) {
         EE.emit(bizErrType, data.error);
       } else {
         // 业务错误码默认处理
-        EE.emit(Request.ResEvtType.DEFAULT_BIZ_ERR, data.error);
+        EE.emit(Request.ResEvtTypes.DEFAULT_BIZ_ERR, data.error);
       }
     }
   }
@@ -252,17 +251,17 @@ function resErrInspector(error) {
       responseType: config.responseType,
       timeout: config.timeout
     },
-    res: { headers }
+    res: { status, statusText, headers }
   };
   // 网络错误或服务异常
   if (Request.loading.on && !config.silent) {
     Request.loading.fail();
   }
-  
-  EE.emit(Request.ResEvtType.NET_ERR, error.response);
+
+  EE.emit(Request.ResEvtTypes.NET_ERR, error.response);
   Log.warn({
     name: '网络错误或服务异常',
-    error: { data, status, statusText },
+    error: { data },
     ...errInfo
   });
 
@@ -294,12 +293,11 @@ function genReqUniqId({
  * @param {string} code 业务错误码
  */
 function buildBizErrTypeWithCode(code) {
-  return `${Request.ResEvtType.BIZ_ERR}_${code}`;
+  return `${Request.ResEvtTypes.BIZ_ERR}_${code}`;
 }
 
 function reqFactory(method) {
   return function(url, data, config) {
-    let short = false;
     let ret = {
       baseURL: request.defaults.baseURL, url, method
     }
@@ -317,7 +315,7 @@ function reqFactory(method) {
     }
 
     ret.params = config.params;
-    
+
     // 3
     const uniqId = genReqUniqId(ret);
     if (Request._reqs.has(uniqId)) {
