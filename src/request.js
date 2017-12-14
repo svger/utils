@@ -50,6 +50,7 @@ import Log from './log';
  *   // 正常情况处理
  * }).catch((err) => {
  *   // 异常处理，一般不需自行处理，除非设置 preventHandleResError 为 true
+ *   // err 可能为业务错对象或 Error 的实例(网络错误对象或代码异常对象)
  * });
  *
  */
@@ -86,17 +87,26 @@ function Request(config) {
   Request._reqs.add(uniqId);
   config.extra = { uniqId };
 
-  request(config);
+  return request(config).then((res) => {
+    const method = config.method;
+    if (isNoBodyMethod(method)) {
+      return res.data;
+    }
+
+    if (res.data && res.data.error) {
+      return Promise.reject(res.data.error);
+    }
+
+    return res.data.result;
+  });
 }
 
 const EE = new EventEmitter();
 
-Request.on = (...args) => { EE.on(...args) };
+Request.on = (...args) => { EE.on(...args); };
 Request.once = (...args) => { EE.once(...args) };
 Request.off = (...args) => { EE.off(...args) };
 Request.removeAllListeners = (...args) => { EE.removeAllListeners(...args); };
-
-Object.assign(Request, EventEmitter.prototype);
 
 // 所有请求方法集合
 Request.Methods = {
@@ -133,17 +143,6 @@ const SAME_REQ_CANCELED = 'same_req_canceled';
 
 // 请求拦截器
 function reqInspector(config) {
-  // 3
-  // const uniqId = genReqUniqId(config);
-  
-  // if (Request._reqs.has(uniqId)) {
-  //   config._source && config._source.cancel(SAME_REQ_CANCELED);
-
-  //   return config;
-  // }
-
-  // Request._reqs.add(uniqId);
-
   // 1
   if (Request.loading.on && !config.silent) {
     Request.loading.show();
@@ -277,10 +276,7 @@ function resErrInspector(error) {
 function genReqUniqId({
   baseURL, url, method, data, params
 }) {
-  if (method === Request.Methods.GET
-    || method === Request.Methods.DELETE
-    || method === Request.Methods.HEAD
-    || method === Request.Methods.OPTIONS) {
+  if (isNoBodyMethod(method)) {
     let _params = { ...params };
 
     if (_params._) {
@@ -290,11 +286,7 @@ function genReqUniqId({
     return `${method}|${baseURL}${url}|${JSON.stringify(_params)}`;
   }
 
-  if (method === Request.Methods.POST
-    || method === Request.Methods.PUT
-    || method === Request.Methods.PATCH) {
-    return `${method}|${baseURL}${url}|${JSON.stringify(data)}`;
-  }
+  return `${method}|${baseURL}${url}|${JSON.stringify(data)}`;
 }
 
 /**
@@ -305,20 +297,17 @@ function buildBizErrTypeWithCode(code) {
   return `${Request.ResEvtType.BIZ_ERR}_${code}`;
 }
 
-function reqFactory(type) {
+function reqFactory(method) {
   return function(url, data, config) {
     let short = false;
     let ret = {
-      baseURL: request.defaults.baseURL, url, method: type
+      baseURL: request.defaults.baseURL, url, method
     }
 
-    if (type === Request.Methods.GET
-      || type === Request.Methods.DELETE
-      || type === Request.Methods.HEAD
-      || type === Request.Methods.OPTIONS
-    ) {
+    const isNoBody = isNoBodyMethod(method);
+
+    if (isNoBody) {
       config = data;
-      short = true;
     } else {
       ret.data = data;
     }
@@ -328,11 +317,6 @@ function reqFactory(type) {
     }
 
     ret.params = config.params;
-
-    // if (!config.cancelToken) {
-    //   config._source = axios.CancelToken.source();
-    //   config.cancelToken = config._source.token;
-    // }
     
     // 3
     const uniqId = genReqUniqId(ret);
@@ -342,12 +326,29 @@ function reqFactory(type) {
     Request._reqs.add(uniqId);
     config.extra = { uniqId };
 
-    if (short) {
-      return request[type](url, config);
+    if (isNoBody) {
+      return request[method](url, config).then(res => res.data);
     }
 
-    return request[type](url, data, config);
+    return request[method](url, data, config).then((res) => {
+      if (res.data && res.data.error) {
+        return Promise.reject(res.data.error);
+      }
+
+      return res.data.result;
+    });
   }
+}
+
+/**
+ * 是否是不含 body 的请求类型
+ * @param {string} method 请求类型
+ */
+function isNoBodyMethod(method) {
+  return method === Request.Methods.GET
+    || method === Request.Methods.DELETE
+    || method === Request.Methods.HEAD
+    || method === Request.Methods.OPTIONS;
 }
 
 // 提供业务增加 inspector

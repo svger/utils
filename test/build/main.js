@@ -8693,8 +8693,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_sinon__ = __webpack_require__(92);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_sinon___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_sinon__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_request__ = __webpack_require__(123);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /* global describe, it */
 
 
@@ -8703,130 +8701,219 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // --require babel-polyfill --require babel-register
 var stockSearchUrl = 'https://ztbhq.shhxzq.com/newapi/json/securitysearch/?exch=0|1';
 
-describe('Request', function () {
-  describe('限流', function () {
-    it('多个相同的请求同时只允许请求一次', function (done) {
-      var cb = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+describe('限流', function () {
+  it('多个相同的请求同时只允许请求一次', function (done) {
+    var cb = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
 
-      var catchHandlerCalled = false;
+    var catchHandlerCalled = false;
 
-      function catchHandler() {
-        if (catchHandlerCalled) {
-          return;
-        }
-
-        catchHandlerCalled = true;
-
-        p1.then(function () {
-          __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(cb.callCount, 1, '只能调一次');
-          done();
-        });
+    function catchHandler() {
+      if (catchHandlerCalled) {
+        return;
       }
 
-      var p1 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
-        params: {
-          num: 6,
-          id: 50
-        }
-      }).then(cb);
+      catchHandlerCalled = true;
 
-      var p2 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
-        params: {
-          num: 6,
-          id: 50
-        }
-      }).then(cb).catch(catchHandler);
+      p1.then(function () {
+        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(cb.callCount, 1, '只能调一次');
+        done();
+      });
+    }
 
-      var p3 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
-        params: {
-          num: 6,
-          id: 50
-        }
-      }).then(cb).catch(catchHandler);
+    var p1 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+      params: {
+        num: 6,
+        id: 50
+      }
+    }).then(cb);
 
-      var p4 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
-        params: {
-          num: 6,
-          id: 50
-        }
-      }).then(cb).catch(catchHandler);
+    var p2 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+      params: {
+        num: 6,
+        id: 50
+      }
+    }).then(cb).catch(catchHandler);
+
+    var p3 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+      params: {
+        num: 6,
+        id: 50
+      }
+    }).then(cb).catch(catchHandler);
+
+    var p4 = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+      params: {
+        num: 6,
+        id: 50
+      }
+    }).then(cb).catch(catchHandler);
+  });
+});
+
+describe('baseURL 配置', function () {
+  __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].request.defaults.baseURL = 'http://nbuat.shhxzq.com/api/nbcb/';
+
+  it('url 使用绝对地址时，baseURL应不可用 ', function (done) {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
+      params: {
+        num: 6,
+        id: 50
+      }
+    }).then(function (ret) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(ret.keyboardFairy.length > 0);
+      done();
     });
   });
 
-  describe('baseURL 配置', function () {
-    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].request.defaults.baseURL = 'http://nbuat.shhxzq.com/api/nbcb/';
-
-    it('url 使用绝对地址时，baseURL应不可用 ', function (done) {
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get(stockSearchUrl, {
-        params: {
-          num: 6,
-          id: 50
-        }
-      }).then(function (res) {
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(_typeof(res.data) === 'object');
-        done();
-      });
+  it('url 使用相对地址，baseURL 可用', function (done) {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
+      method: 'sas.assetsQuery',
+      fundId: '880004877',
+      moneyType: "0"
+    }).then(function (ret) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(ret.length > 0);
+      done();
     });
+  });
+});
 
-    it('url 使用相对地址，baseURL 可用', function (done) {
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
-        method: 'sas.assetsQuery',
-        fundId: '880004877',
-        moneyType: "0"
-      }).then(function (res) {
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(_typeof(res.data) === 'object');
-        done();
-      });
+describe('loading 配置', function () {
+  var show = void 0,
+      close = void 0,
+      fail = void 0;
+
+  beforeEach(function () {
+    show = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    close = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    fail = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading = {
+      on: true,
+      show: show, close: close, fail: fail
+    };
+  });
+
+  it('loading 开关打开时，请求时展示loading，结束后自动关闭', function (done) {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
+      method: 'sas.assetsQuery',
+      fundId: '880004877',
+      moneyType: "0"
+    }).then(function (res) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(show.calledOnce, '展示loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(close.calledOnce, '关闭loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 0, '应不展示失败提示');
+      done();
     });
   });
 
-  describe('loading 配置', function () {
-    var show = void 0,
-        close = void 0,
-        fail = void 0;
-
-    beforeEach(function () {
-      show = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      close = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      fail = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading = {
-        on: true,
-        show: show, close: close, fail: fail
-      };
+  it('loading 开关打开时，请求失败应展示失败提示', function (done) {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get('sas').catch(function (err) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(show.calledOnce, '展示loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '应不关闭loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 1, '应展示失败提示');
+      done();
     });
+  });
 
-    it('loading 开关打开时，请求时展示loading，结束后自动关闭', function (done) {
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
+  it('若配置 silent，应不展示 loading', function (done) {
+    Object(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */])({
+      method: 'post',
+      url: 'sas',
+      data: {
         method: 'sas.assetsQuery',
-        fundId: '880004877',
+        // fundId: '880004877',
         moneyType: "0"
-      }).then(function (res) {
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(show.calledOnce, '展示loading');
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(close.calledOnce, '关闭loading');
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 0, '应不展示失败提示');
-        done();
-      });
+      },
+      silent: true
+    }).catch(function (err) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(show.callCount, 0, '不展示loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '不关闭loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 0, '不展示失败提示');
+      done();
     });
+  });
 
-    it('loading 开关打开时，请求失败应展示失败提示', function (done) {
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get('sas').catch(function (err) {
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(show.calledOnce, '展示loading');
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '应不关闭loading');
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 1, '应展示失败提示');
-        done();
-      });
+  it('loading 开关关闭时，不应展示 loading 提示', function (done) {
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading.on = false;
+
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get('trade').catch(function (err) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(show.callCount, 0, '不展示loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '不关闭loading');
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 0, '不展示失败提示');
+      done();
     });
+  });
+});
 
-    it('loading 开关关闭时，不应展示 loading 提示', function (done) {
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading.on = false;
+describe('业务错误码处理', function () {
+  it('若对错误码没有特殊处理，则使用默认处理', function (done) {
+    var defaultBizErrHandler = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].on(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].ResEvtType.DEFAULT_BIZ_ERR, defaultBizErrHandler);
 
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get('trade').catch(function (err) {
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(show.callCount, 0, '不展示loading');
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '不关闭loading');
-        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 0, '不展示失败提示');
-        done();
-      });
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
+      method: 'sas.assetsQuery',
+      // fundId: '880004877',
+      moneyType: "0"
+    }).catch(function (err) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(defaultBizErrHandler.calledOnce, '业务错误码默认处理');
+      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].off(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].ResEvtType.DEFAULT_BIZ_ERR);
+      done();
+    });
+  });
+
+  it('对公共业务错误码处理', function (done) {
+    var notLoginHandler = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    var pwdErrCode = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].buildBizErrTypeWithCode(10505001);
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].on(pwdErrCode, notLoginHandler);
+
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('kh', {
+      method: 'sso.login',
+      inputId: "880004877",
+      inputType: 'Z',
+      netAddr: '5',
+      netAddr2: '5',
+      cryptPwd: ""
+    }).catch(function (err) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(notLoginHandler.calledOnce, '具体业务错误码处理');
+      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].off(pwdErrCode);
+      done();
+    });
+  });
+
+  it('对特殊业务错误码处理', function (done) {
+    var bizErrHandler = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    var bizErrCode = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].buildBizErrTypeWithCode(10800999);
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].once(bizErrCode, bizErrHandler);
+
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
+      method: 'sas.assetsQuery',
+      // fundId: '880004877',
+      moneyType: "0"
+    }).catch(function (err) {
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(bizErrHandler.calledOnce, '特殊业务错误码处理');
+      done();
+    });
+  });
+
+  it('若配置 preventHandleResError 为 true，应不处理业务错误码', function (done) {
+    var bizErrHandler = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    var bizErrCode = __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].buildBizErrTypeWithCode(10800999);
+    __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].once(bizErrCode, bizErrHandler);
+
+    Object(__WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */])({
+      method: 'post',
+      url: 'sas',
+      data: {
+        method: 'sas.assetsQuery'
+        // fundId: '880004877',
+        // moneyType: "0"
+      },
+      preventHandleResError: true
+    }).catch(function (err) {
+      console.log('业务错误：', err);
+
+      __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(bizErrHandler.callCount, 0, '不应被调用');
+      done();
     });
   });
 });
@@ -21726,6 +21813,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
  *   // 正常情况处理
  * }).catch((err) => {
  *   // 异常处理，一般不需自行处理，除非设置 preventHandleResError 为 true
+ *   // err 可能为业务错对象或 Error 的实例(网络错误对象或代码异常对象)
  * });
  *
  */
@@ -21761,7 +21849,18 @@ function Request(config) {
   Request._reqs.add(uniqId);
   config.extra = { uniqId: uniqId };
 
-  request(config);
+  return request(config).then(function (res) {
+    var method = config.method;
+    if (isNoBodyMethod(method)) {
+      return res.data;
+    }
+
+    if (res.data && res.data.error) {
+      return Promise.reject(res.data.error);
+    }
+
+    return res.data.result;
+  });
 }
 
 var EE = new __WEBPACK_IMPORTED_MODULE_1_eventemitter3___default.a();
@@ -21778,8 +21877,6 @@ Request.off = function () {
 Request.removeAllListeners = function () {
   EE.removeAllListeners.apply(EE, arguments);
 };
-
-Object.assign(Request, __WEBPACK_IMPORTED_MODULE_1_eventemitter3___default.a.prototype);
 
 // 所有请求方法集合
 Request.Methods = {
@@ -21816,17 +21913,6 @@ var SAME_REQ_CANCELED = 'same_req_canceled';
 
 // 请求拦截器
 function reqInspector(config) {
-  // 3
-  // const uniqId = genReqUniqId(config);
-
-  // if (Request._reqs.has(uniqId)) {
-  //   config._source && config._source.cancel(SAME_REQ_CANCELED);
-
-  //   return config;
-  // }
-
-  // Request._reqs.add(uniqId);
-
   // 1
   if (Request.loading.on && !config.silent) {
     Request.loading.show();
@@ -21976,7 +22062,7 @@ function genReqUniqId(_ref) {
       data = _ref.data,
       params = _ref.params;
 
-  if (method === Request.Methods.GET || method === Request.Methods.DELETE || method === Request.Methods.HEAD || method === Request.Methods.OPTIONS) {
+  if (isNoBodyMethod(method)) {
     var _params = _extends({}, params);
 
     if (_params._) {
@@ -21986,9 +22072,7 @@ function genReqUniqId(_ref) {
     return method + '|' + baseURL + url + '|' + JSON.stringify(_params);
   }
 
-  if (method === Request.Methods.POST || method === Request.Methods.PUT || method === Request.Methods.PATCH) {
-    return method + '|' + baseURL + url + '|' + JSON.stringify(data);
-  }
+  return method + '|' + baseURL + url + '|' + JSON.stringify(data);
 }
 
 /**
@@ -21999,16 +22083,17 @@ function buildBizErrTypeWithCode(code) {
   return Request.ResEvtType.BIZ_ERR + '_' + code;
 }
 
-function reqFactory(type) {
+function reqFactory(method) {
   return function (url, data, config) {
     var short = false;
     var ret = {
-      baseURL: request.defaults.baseURL, url: url, method: type
+      baseURL: request.defaults.baseURL, url: url, method: method
     };
 
-    if (type === Request.Methods.GET || type === Request.Methods.DELETE || type === Request.Methods.HEAD || type === Request.Methods.OPTIONS) {
+    var isNoBody = isNoBodyMethod(method);
+
+    if (isNoBody) {
       config = data;
-      short = true;
     } else {
       ret.data = data;
     }
@@ -22019,11 +22104,6 @@ function reqFactory(type) {
 
     ret.params = config.params;
 
-    // if (!config.cancelToken) {
-    //   config._source = axios.CancelToken.source();
-    //   config.cancelToken = config._source.token;
-    // }
-
     // 3
     var uniqId = genReqUniqId(ret);
     if (Request._reqs.has(uniqId)) {
@@ -22032,12 +22112,28 @@ function reqFactory(type) {
     Request._reqs.add(uniqId);
     config.extra = { uniqId: uniqId };
 
-    if (short) {
-      return request[type](url, config);
+    if (isNoBody) {
+      return request[method](url, config).then(function (res) {
+        return res.data;
+      });
     }
 
-    return request[type](url, data, config);
+    return request[method](url, data, config).then(function (res) {
+      if (res.data && res.data.error) {
+        return Promise.reject(res.data.error);
+      }
+
+      return res.data.result;
+    });
   };
+}
+
+/**
+ * 是否是不含 body 的请求类型
+ * @param {string} method 请求类型
+ */
+function isNoBodyMethod(method) {
+  return method === Request.Methods.GET || method === Request.Methods.DELETE || method === Request.Methods.HEAD || method === Request.Methods.OPTIONS;
 }
 
 // 提供业务增加 inspector
