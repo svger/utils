@@ -256,7 +256,10 @@ function resErrInspector(error) {
     res: { headers }
   };
   // 网络错误或服务异常
-  Request.loading.fail();
+  if (Request.loading.on && !config.silent) {
+    Request.loading.fail();
+  }
+  
   EE.emit(Request.ResEvtType.NET_ERR, error.response);
   Log.warn({
     name: '网络错误或服务异常',

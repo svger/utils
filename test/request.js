@@ -84,15 +84,20 @@ describe('Request', () => {
   });
 
   describe('loading 配置', () => {
-    it('loading 开关打开时，请求时展示loading，结束后自动关闭', (done) => {
-      const show = sinon.spy();
-      const close = sinon.spy();
-      const fail = sinon.spy();
+    let show, close, fail;
+
+    beforeEach(() => {
+      show = sinon.spy();
+      close = sinon.spy();
+      fail = sinon.spy();
+
       Request.loading = {
         on: true,
         show, close, fail
       };
+    });
 
+    it('loading 开关打开时，请求时展示loading，结束后自动关闭', (done) => {
       Request.post('sas', {
         method: 'sas.assetsQuery',
         fundId: '880004877',
@@ -106,18 +111,21 @@ describe('Request', () => {
     });
 
     it('loading 开关打开时，请求失败应展示失败提示', (done) => {
-      const show = sinon.spy();
-      const close = sinon.spy();
-      const fail = sinon.spy();
-      Request.loading = {
-        on: true,
-        show, close, fail
-      };
-
       Request.get('sas').catch((err) => {
         assert.ok(show.calledOnce, '展示loading');
         assert.equal(close.callCount, 0, '应不关闭loading');
         assert.equal(fail.callCount, 1, '应展示失败提示');
+        done();
+      });
+    });
+
+    it('loading 开关关闭时，不应展示 loading 提示', (done) => {
+      Request.loading.on = false;
+
+      Request.get('trade').catch((err) => {
+        assert.equal(show.callCount, 0, '不展示loading');
+        assert.equal(close.callCount, 0, '不关闭loading');
+        assert.equal(fail.callCount, 0, '不展示失败提示');
         done();
       });
     });

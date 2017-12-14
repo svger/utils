@@ -8781,15 +8781,22 @@ describe('Request', function () {
   });
 
   describe('loading 配置', function () {
-    it('loading 开关打开时，请求时展示loading，结束后自动关闭', function (done) {
-      var show = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      var close = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      var fail = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+    var show = void 0,
+        close = void 0,
+        fail = void 0;
+
+    beforeEach(function () {
+      show = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+      close = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+      fail = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
+
       __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading = {
         on: true,
         show: show, close: close, fail: fail
       };
+    });
 
+    it('loading 开关打开时，请求时展示loading，结束后自动关闭', function (done) {
       __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].post('sas', {
         method: 'sas.assetsQuery',
         fundId: '880004877',
@@ -8803,18 +8810,21 @@ describe('Request', function () {
     });
 
     it('loading 开关打开时，请求失败应展示失败提示', function (done) {
-      var show = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      var close = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      var fail = __WEBPACK_IMPORTED_MODULE_1_sinon___default.a.spy();
-      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading = {
-        on: true,
-        show: show, close: close, fail: fail
-      };
-
       __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get('sas').catch(function (err) {
         __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].ok(show.calledOnce, '展示loading');
         __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '应不关闭loading');
         __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 1, '应展示失败提示');
+        done();
+      });
+    });
+
+    it('loading 开关关闭时，不应展示 loading 提示', function (done) {
+      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].loading.on = false;
+
+      __WEBPACK_IMPORTED_MODULE_2__src_request__["a" /* default */].get('trade').catch(function (err) {
+        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(show.callCount, 0, '不展示loading');
+        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(close.callCount, 0, '不关闭loading');
+        __WEBPACK_IMPORTED_MODULE_0_chai__["assert"].equal(fail.callCount, 0, '不展示失败提示');
         done();
       });
     });
@@ -21942,7 +21952,10 @@ function resErrInspector(error) {
     res: { headers: headers }
   };
   // 网络错误或服务异常
-  Request.loading.fail();
+  if (Request.loading.on && !config.silent) {
+    Request.loading.fail();
+  }
+
   EE.emit(Request.ResEvtType.NET_ERR, error.response);
   __WEBPACK_IMPORTED_MODULE_5__log__["a" /* default */].warn(_extends({
     name: '网络错误或服务异常',
