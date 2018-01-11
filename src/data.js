@@ -1,11 +1,25 @@
 import { getItem, setItem, Types } from 'cefc-utils/src/storage';
 
+let __cache = {
+  user: {},
+  oac: {},
+  meta: {}
+};
+
 /**
  * 获取用户信息
  * @returns
  */
 export const getUser = () => {
-  return { ...window.cefc.user };
+  return { ...__cache.user };
+};
+
+/**
+ * 设置用户信息
+ * @param {Object} user 用户数据
+ */
+export const setUser = (user) => {
+  __cache.user = { ...user };
 };
 
 /**
@@ -13,24 +27,31 @@ export const getUser = () => {
  * @returns
  */
 export const getOAC = () => {
-  return { ...window.cefc.oac };
+  return { ...__cache.oac };
+};
+
+/**
+ * 设置开户状态信息
+ * @param {Object} oac 开户状态信息
+ */
+export const setOAC = (oac) => {
+  __cache.oac = { ...oac };
 };
 
 /**
  * 获取应用描述信息
- * @returns
+ * @returns { version: appVersion, deviceType, platform, debug }
  */
 export const getAppMeta = () => {
-  const {
-    appVersion, deviceType, platform, debug
-  } = window;
+  return { ...__cache.oac };
+}
 
-  return {
-    version: appVersion,
-    deviceType,
-    platform,
-    debug
-  };
+/**
+ * 设置 AppMeta 信息
+ * @param {Object} meta AppMeta 信息
+ */
+export const setAppMeta = (meta) => {
+  __cache.meta = { ...meta };
 }
 
 /**

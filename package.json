@@ -1,5 +1,5 @@
 {
-  "name": "biz-utils",
+  "name": "cefc-biz-utils",
   "version": "0.0.2",
   "description": "业务公共 utils",
   "main": "src/index.js",
