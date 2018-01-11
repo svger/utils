@@ -1,8 +1,8 @@
 import axios from 'axios';
 import EventEmitter from 'eventemitter3';
-import { sign } from 'cefc-utils/src/sign';
-import { genTrackStat } from './tracker';
-import { getUser, getAppMeta } from './data';
+// import { sign } from 'cefc-utils/src/sign';
+// import { genTrackStat } from './tracker';
+// import { getUser, getAppMeta } from './data';
 import Log from './log';
 
 /**
@@ -70,11 +70,6 @@ request.defaults.timeout = 1000 * 60;
  * @param {boolean} config.silent 是否静默请求，不展示 loading，默认不展示 true
  */
 function Request(config) {
-  // if (!config.cancelToken) {
-  //   config._source = axios.CancelToken.source();
-  //   config.cancelToken = config._source.token;
-  // }
-
   // 3
   const uniqId = genReqUniqId({
     baseURL: request.defaults.baseURL,
@@ -132,6 +127,9 @@ Request.loading = {
   fail() {}
 };
 
+// 根据请求配置生成自定义 headers
+Request.dynamicHeaders = () => {}
+
 // 请求中的 reqUniqId 集合
 Request._reqs = new Set();
 
@@ -149,21 +147,24 @@ function reqInspector(config) {
 
   // 5
   if (config.data && config.method.toLowerCase() === Request.Methods.POST) {
-    const { clientId, tpId } = getUser();
-    const trackStat = genTrackStat();
-    const { version, deviceType } = getAppMeta();
+    // 组装 sas 身份验证、用户有效性验证、签名验证所需请求头
+    Object.assign(config.headers, Request.dynamicHeaders(config) || {});
+
+    // const { clientId, tpId } = getUser();
+    // const trackStat = genTrackStat();
+    // const { version, deviceType } = getAppMeta();
 
     // 组装 sas 身份验证、用户有效性验证、签名验证所需请求头
-    Object.assign(config.headers, {
-      ...trackStat,
-      sign: sign(JSON.stringify(config.data), trackStat.uuid, tpId),
-      deviceId: tpId,
-      tpClientId: clientId,
-      timestamp: Date.now(),
-      noncestr: trackStat.uuid,
-      v: version,
-      deviceType
-    });
+    // Object.assign(config.headers, {
+    //   ...trackStat,
+    //   sign: sign(JSON.stringify(config.data), trackStat.uuid, tpId),
+    //   deviceId: tpId,
+    //   tpClientId: clientId,
+    //   timestamp: Date.now(),
+    //   noncestr: trackStat.uuid,
+    //   v: version,
+    //   deviceType
+    // });
 
     // 2
     // 适配 sas 数据格式

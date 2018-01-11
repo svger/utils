@@ -4,6 +4,8 @@ import { calcStorageDataSize, available, Types } from 'cefc-utils/src/storage';
 import Log from 'cefc-utils/src/log';
 import { getUser, getAppMeta } from './data';
 
+const isBrowser = process.env.BROWSER;
+
 /**
  * 获取基本日志信息
  *
@@ -25,8 +27,7 @@ function getBaseLogInfo() {
     sessionStorageDataSize: calcStorageDataSize(Types.SESSION),
     localStorageDataSize: calcStorageDataSize(Types.LOCAL),
     appVer: version,
-    ua: navigator.userAgent,
-    t: new Date().getTime()
+    ua: navigator.userAgent
   };
 }
 
@@ -62,13 +63,28 @@ Log.init = function (reporter) {
   let _reporter = _defaultReporter;
 
   if (reporter) {
-    _reporter = (data) => reporter({ env: 'browser', ...data, ...getBaseLogInfo() });
+    _reporter = (data) => {
+      let info = {
+        env: isBrowser ? 'browser' : 'server',
+        ...data,
+        t: new Date().getTime()
+      };
+
+      if (isBrowser) {
+        Object.assign(info, getBaseLogInfo());
+      }
+
+      reporter(info);
+    };
   }
 
   // 日志上报设置
   Log.setReporter(_reporter);
-  // 收集异常
-  monitorException();
+
+  if (isBrowser) {
+    // 收集异常
+    monitorException();
+  }
 };
 
 
