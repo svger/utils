@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
   "author": "Kane <xiaoyunhua@shhxzq.com>",
-  "license": "MIT",
   "scripts": {
     "test": "webpack --config webpack.config.js && mocha ./test/build/*.js"
   },
