@@ -1,13 +1,15 @@
 {
   "name": "cefc-biz-utils",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "业务公共 utils",
-  "main": "src/index.js",
+  "main": "build/index.js",
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
   "author": "Kane <xiaoyunhua@shhxzq.com>",
   "license": "ISC",
   "scripts": {
-    "test": "webpack --config webpack.config.js && mocha ./test/build/*.js"
+    "test": "webpack --config webpack.config.js && mocha ./test/build/*.js",
+    "build": "node_modules/.bin/tools run build",
+    "lint": "node_modules/.bin/tools run lint"
   },
   "babel": {
     "presets": [
@@ -34,7 +36,7 @@
     "babel-polyfill": "~6.26.0",
     "babel-preset-env": "~1.6.1",
     "babel-register": "~6.26.0",
-    "cefc-tools": "~0.0.4",
+    "cefc-tools": "^0.0.14",
     "chai": "~4.1.2",
     "eslint": "^4.13.1",
     "eslint-config-airbnb-base": "~12.1.0",
