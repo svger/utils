@@ -1,6 +1,6 @@
 {
   "name": "cefc-biz-utils",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "业务公共 utils",
   "main": "src/index.js",
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
