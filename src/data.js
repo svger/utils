@@ -1,4 +1,4 @@
-import { getItem, setItem, Types } from 'cefc-utils/src/storage';
+import { getItem, setItem, Types } from 'cefc-utils/es/storage';
 
 let __cache = {
   user: {},
