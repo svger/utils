@@ -1,12 +1,18 @@
 {
   "name": "cefc-biz-utils",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "description": "业务公共 utils",
   "main": "lib/index.js",
   "module": "es/index.js",
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
   "author": "Kane <xiaoyunhua@shhxzq.com>",
   "license": "ISC",
+  "files": [
+    "dist",
+    "lib",
+    "es",
+    "src"
+  ],
   "scripts": {
     "test": "webpack --config webpack.config.js && mocha ./test/build/*.js",
     "lint": "node_modules/.bin/tools run lint",
@@ -14,8 +20,8 @@
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./es",
     "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -o dist/index.js",
     "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c -o dist/index.min.js",
-    "build": "npm run prepare && npm run build:commonjs && npm run build:es",
-    "prepare": "rm -rf ./dist ./es ./lib"
+    "build": "npm run clean && npm run build:commonjs && npm run build:es",
+    "clean": "rm -rf ./dist ./es ./lib"
   },
   "devDependencies": {
     "babel-cli": "~6.26.0",
@@ -82,5 +88,14 @@
         ]
       }
     }
-  }
+  },
+  "npmName": "cefc-biz-utils",
+  "npmFileMap": [
+    {
+      "basePath": "/lib/",
+      "files": [
+        "*.js"
+      ]
+    }
+  ]
 }
