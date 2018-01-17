@@ -5,7 +5,6 @@
   "main": "lib/index.js",
   "module": "es/index.js",
   "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
-  "author": "Kane <xiaoyunhua@shhxzq.com>",
   "license": "ISC",
   "files": [
     "dist",
