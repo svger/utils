@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import Request from '../src/request';
 
 // --require babel-polyfill --require babel-register
-const stockSearchUrl = 'https://ztbhq.shhxzq.com/newapi/json/securitysearch/?exch=0|1'
+const stockSearchUrl = 'https://baidu.com/'
 
 describe('限流', () => {
   it('多个相同的请求同时只允许请求一次', (done) => {
@@ -56,7 +56,7 @@ describe('限流', () => {
 });
 
 describe('baseURL 配置', () => {
-  Request.request.defaults.baseURL = 'http://nbuat.shhxzq.com/api/nbcb/';
+  Request.request.defaults.baseURL = 'http://baidu.com';
 
   it('url 使用绝对地址时，baseURL应不可用 ', (done) => {
     Request.get(stockSearchUrl, {
