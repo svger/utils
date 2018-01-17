@@ -1,4 +1,4 @@
-import { sign } from 'cefc-utils/es/sign';
+import { sign } from 'cefc-utils/lib/sign';
 import { genTrackStat } from './tracker';
 import { getUser, getAppMeta } from './data';
 

@@ -1,7 +1,7 @@
 /* global navigator */
 import axios from 'axios';
-import { calcStorageDataSize, available, Types } from 'cefc-utils/es/storage';
-import Log from 'cefc-utils/es/log';
+import { calcStorageDataSize, available, Types } from 'cefc-utils/lib/storage';
+import Log from 'cefc-utils/lib/log';
 import { getUser, getAppMeta } from './data';
 
 const isBrowser = process.env.BROWSER;
