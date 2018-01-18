@@ -1,6 +1,6 @@
 {
-  "name": "cefc-biz-utils",
-  "version": "0.0.15",
+  "name": "svger-biz-utils",
+  "version": "0.0.1",
   "description": "业务公共 utils",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -87,7 +87,7 @@
       }
     }
   },
-  "npmName": "cefc-biz-utils",
+  "npmName": "svger-biz-utils",
   "npmFileMap": [
     {
       "basePath": "/lib/",
