@@ -1568,12 +1568,6 @@ cefc-tools@^0.0.15:
     webpack-dev-server "~2.9.4"
     webpack-stream "~4.0.0"
 
-cefc-utils@~0.0.12:
-  version "0.0.12"
-  resolved "https://registry.npmjs.org/cefc-utils/-/cefc-utils-0.0.12.tgz#a276d90e67b42acd652d632ddb2f5ef46523f588"
-  dependencies:
-    md5 "~2.2.1"
-
 center-align@^0.1.1:
   version "0.1.3"
   resolved "https://registry.npmjs.org/center-align/-/center-align-0.1.3.tgz#aa0d32629b6ee972200411cbd4461c907bc2b7ad"
@@ -6871,6 +6865,12 @@ supports-color@^4.0.0, supports-color@^4.2.1, supports-color@^4.4.0:
   resolved "https://registry.npmjs.org/supports-color/-/supports-color-4.5.0.tgz#be7a0de484dec5c5cddf8b3d59125044912f635b"
   dependencies:
     has-flag "^2.0.0"
+
+svger-utils@~0.0.2:
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/svger-utils/-/svger-utils-0.0.2.tgz#59a2b87333146f6737c8306c3c2e89041eb82050"
+  dependencies:
+    md5 "~2.2.1"
 
 svgo@^0.7.0:
   version "0.7.2"

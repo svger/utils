@@ -49,11 +49,11 @@
   },
   "dependencies": {
     "axios": "~0.17.1",
-    "cefc-utils": "~0.0.12",
     "eventemitter3": "~3.0.0",
     "qs": "~6.5.1",
     "redux": "~3.7.2",
-    "redux-thunk": "~2.2.0"
+    "redux-thunk": "~2.2.0",
+    "svger-utils": "~0.0.2"
   },
   "babel": {
     "presets": [
