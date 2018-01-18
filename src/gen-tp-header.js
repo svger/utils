@@ -7,7 +7,7 @@ export default function gen(config) {
   const { clientId, tpId } = getUser();
   const { version, deviceType } = getAppMeta();
 
-  // 组装 sas 身份验证、用户有效性验证、签名验证所需请求头
+  // 组装 身份验证、用户有效性验证、签名验证所需请求头
   return {
     ...trackStat,
     sign: sign(JSON.stringify(config.data), trackStat.uuid, tpId),

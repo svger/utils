@@ -1,10 +1,9 @@
 {
   "name": "cefc-biz-utils",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "description": "业务公共 utils",
   "main": "lib/index.js",
   "module": "es/index.js",
-  "repository": "git@10.199.101.162:CEFC-UTILS/biz-utils.git",
   "license": "ISC",
   "files": [
     "dist",
